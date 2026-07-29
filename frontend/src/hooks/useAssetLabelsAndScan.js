@@ -155,8 +155,9 @@ function normalizeLabelPrintMode(mode) {
   return mode === LABEL_PRINT_MODE.BARCODE ? LABEL_PRINT_MODE.BARCODE : LABEL_PRINT_MODE.QR
 }
 
-function getBarcodeHeading() {
-  return 'Residencia Familiar'
+function getBarcodeHeading(label) {
+  const residenceName = label?.residenceName || label?.establishment || 'SIN RESIDENCIA'
+  return `RESIDENCIA FAMILIAR: ${residenceName}`
 }
 
 function getBarcodeProductName(label) {
@@ -389,36 +390,48 @@ function useAssetLabelsAndScan({
         text-align: center;
       }
       .sheet.sheet-barcode .barcode-institution-line {
-        font-size: 1.75mm;
-        line-height: 0.98;
+        font-size: 1.55mm;
+        line-height: 0.96;
         font-weight: 900;
         letter-spacing: 0.01mm;
+        color: #020617;
+        text-transform: uppercase;
+      }
+      .sheet.sheet-barcode .barcode-regional {
+        position: absolute;
+        left: 1mm;
+        top: 6.85mm;
+        width: calc(100% - 2mm);
+        text-align: center;
+        font-size: 1.5mm;
+        line-height: 1;
+        font-weight: 900;
         color: #020617;
         text-transform: uppercase;
       }
       .sheet.sheet-barcode .barcode-heading {
         position: absolute;
         left: 1mm;
-        top: 8mm;
+        top: 8.35mm;
         width: calc(100% - 2mm);
         text-align: center;
-        font-size: 2.05mm;
+        font-size: 1.5mm;
         line-height: 0.98;
         font-weight: 900;
         color: #020617;
         white-space: normal;
         word-break: break-word;
-        max-height: 3mm;
+        max-height: 2.9mm;
         overflow: hidden;
         text-overflow: ellipsis;
       }
       .sheet.sheet-barcode .barcode-sector {
         position: absolute;
         left: 1mm;
-        top: 10.25mm;
+        top: 11.25mm;
         width: calc(100% - 2mm);
         text-align: center;
-        font-size: 1.72mm;
+        font-size: 1.55mm;
         line-height: 0.98;
         font-weight: 900;
         color: #020617;
@@ -509,7 +522,7 @@ function useAssetLabelsAndScan({
         <div class="code-top">${codeLabel}</div>
         ${
           mode === LABEL_PRINT_MODE.BARCODE
-            ? `<div class="barcode-institution">${barcodeInstitution}</div><div class="barcode-heading">${barcodeHeading}</div><div class="barcode-sector">${barcodeSector}</div><div class="barcode-product">${barcodeProduct}</div>`
+            ? `<div class="barcode-institution">${barcodeInstitution}</div><div class="barcode-regional">DIRECCIÓN REGIONAL</div><div class="barcode-heading">${barcodeHeading}</div><div class="barcode-sector">${barcodeSector}</div><div class="barcode-product">${barcodeProduct}</div>`
             : `<div class="side-right">${getLabelBodyHtml(label)}</div>`
         }
         ${mode === LABEL_PRINT_MODE.BARCODE ? '' : getLabelBrandingHtml(branding)}
