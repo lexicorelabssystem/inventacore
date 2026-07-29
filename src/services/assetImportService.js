@@ -1,4 +1,5 @@
 const fs = require("node:fs/promises");
+const os = require("node:os");
 const path = require("node:path");
 const ExcelJS = require("exceljs");
 const { prisma } = require("../prisma");
@@ -29,6 +30,7 @@ const HEADER_ALIASES = {
   codigo: "internalcode",
   codigointerno: "internalcode",
   codigomau: "internalcode",
+  codigoval: "internalcode",
   nombre: "name",
   nombredelbien: "name",
   marca: "brand",
@@ -90,7 +92,7 @@ const IMPORT_PLACEHOLDER_TEXTS = new Set([
 
 const IMPORT_CHUNK_SIZE = 25;
 const IMPORT_PROGRESS_FLUSH_EVERY = 10;
-const IMPORT_TMP_DIR = path.join(process.cwd(), "tmp", "asset-imports");
+const IMPORT_TMP_DIR = path.join(os.tmpdir(), "inventacore", "asset-imports");
 
 function normalizeHeader(value) {
   return String(value || "")
