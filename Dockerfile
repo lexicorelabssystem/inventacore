@@ -20,6 +20,7 @@ COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node package.json package-lock.json prisma.config.ts ./
 COPY --chown=node:node prisma ./prisma
 COPY --chown=node:node src ./src
+COPY --chown=node:node scripts/verifyNewDatabaseTarget.js ./scripts/verifyNewDatabaseTarget.js
 
 USER node
 EXPOSE 3000
