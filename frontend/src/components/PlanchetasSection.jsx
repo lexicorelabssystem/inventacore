@@ -32,8 +32,8 @@ function formatPlanchetaDateTime(value) {
 
 function formatPlanchetaCode(value) {
   const numeric = Number(value)
-  if (!Number.isInteger(numeric) || numeric <= 0) return 'MAU0000000'
-  return `MAU${String(numeric).padStart(7, '0')}`
+  if (!Number.isInteger(numeric) || numeric <= 0) return 'VAL0000000'
+  return `VAL${String(numeric).padStart(7, '0')}`
 }
 
 function resolvePlanchetaDisplayCode(assetLike) {

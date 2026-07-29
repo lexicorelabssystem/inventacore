@@ -124,7 +124,7 @@ function AssetRecordsTable(props) {
   function formatMauPreview(value) {
     const number = Number(value)
     if (!Number.isInteger(number) || number <= 0) return ''
-    return `MAU${String(number).padStart(7, '0')}`
+    return `VAL${String(number).padStart(7, '0')}`
   }
 
   function resizeBlankResidences(countInput) {
@@ -390,14 +390,14 @@ function AssetRecordsTable(props) {
               </div>
             </div>
             <div className="label-print-card">
-              <strong className="label-print-title">Etiquetas MAU vacias</strong>
+              <strong className="label-print-title">Etiquetas VAL vacias</strong>
               <div className="label-print-actions">
                 <button
                   className="ghost"
                   disabled={assetsLoading}
                   onClick={() => setBlankPrintOpen(true)}
                 >
-                  Crear secuencia MAU
+                  Crear secuencia VAL
                 </button>
               </div>
             </div>
@@ -642,7 +642,7 @@ function AssetRecordsTable(props) {
           <div className="modal-backdrop" onClick={() => setBlankPrintOpen(false)}>
             <div className="modal-card" onClick={(event) => event.stopPropagation()}>
               <div className="modal-head">
-                <h4>Crear etiquetas MAU vacias</h4>
+                <h4>Crear etiquetas VAL vacias</h4>
                 <button type="button" className="ghost" onClick={() => setBlankPrintOpen(false)}>
                   Cerrar
                 </button>
@@ -650,7 +650,7 @@ function AssetRecordsTable(props) {
               <div className="modal-body modal-form">
                 <p className="muted">
                   Esto no guarda activos. Primero indica cuantas residencias son, luego el nombre y
-                  cantidad de etiquetas para cada una. El MAU continua sin saltos entre residencias.
+                  cantidad de etiquetas para cada una. El VAL continua sin saltos entre residencias.
                 </p>
                 <label className="modal-label">
                   <strong>Cantidad de residencias</strong>
@@ -662,7 +662,7 @@ function AssetRecordsTable(props) {
                   />
                 </label>
                 <label className="modal-label">
-                  <strong>Primer MAU a imprimir</strong>
+                  <strong>Primer VAL a imprimir</strong>
                   <input
                     inputMode="numeric"
                     value={blankPrintForm.startCode}
@@ -723,7 +723,7 @@ function AssetRecordsTable(props) {
                 )}
                 <div className="modal-actions">
                   <button type="button" onClick={confirmBlankPrint} disabled={!canPrintBlankLabels}>
-                    Imprimir etiquetas MAU
+                    Imprimir etiquetas VAL
                   </button>
                   <button type="button" className="ghost" onClick={() => setBlankPrintOpen(false)}>
                     Cancelar

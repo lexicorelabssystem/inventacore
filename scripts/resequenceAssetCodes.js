@@ -2,7 +2,7 @@ require("../src/config/loadEnv").loadEnv();
 const { prisma } = require("../src/prisma");
 
 const DEFAULT_ORDER = ["ALAMEDA", "IRTA|KAI", "PEHUENCHE", "UEFA"];
-const EXECUTION_CONFIRM_TEXT = "RESECUENCIAR MAU";
+const EXECUTION_CONFIRM_TEXT = "RESECUENCIAR VAL";
 
 function argValue(name, fallback = "") {
   const prefix = `--${name}=`;
@@ -118,7 +118,7 @@ async function main() {
   const tempBase = currentMaxCode + maxTargetCode + 5000;
 
   console.log("");
-  console.log("=== Resecuencia de codigos de inventario (MAU) ===");
+  console.log("=== Resecuencia de codigos de inventario (VAL) ===");
   console.log(`Activos totales: ${plan.length}`);
   console.log(`Activos con cambio de codigo: ${changedCount}`);
   console.log(`Orden prioritario: ${priorityGroups.map((group) => group.join("|")).join(" -> ")}`);
@@ -133,8 +133,8 @@ async function main() {
       nombre: item.assetName,
       actual: item.fromCode,
       nuevo: item.toCode,
-      actual_mau: `MAU${String(item.fromCode).padStart(7, "0")}`,
-      nuevo_mau: `MAU${String(item.toCode).padStart(7, "0")}`,
+      actual_mau: `VAL${String(item.fromCode).padStart(7, "0")}`,
+      nuevo_mau: `VAL${String(item.toCode).padStart(7, "0")}`,
     }))
   );
 
@@ -187,7 +187,7 @@ async function main() {
 
   console.log("");
   console.log("[OK] Resecuencia completada.");
-  console.log(`Nuevo rango: MAU0000001 .. MAU${String(maxTargetCode).padStart(7, "0")}`);
+  console.log(`Nuevo rango: VAL0000001 .. VAL${String(maxTargetCode).padStart(7, "0")}`);
   console.log("Todas las secuencias institucionales quedaron alineadas al nuevo maximo global.");
 }
 

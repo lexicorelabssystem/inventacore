@@ -535,7 +535,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
       : null;
     const templateType = headerRowNumber === 1
       ? "LEGACY_ENCABEZADO_FILA_1"
-      : "MAU_OFICIAL_ENCABEZADO_DETECTADO";
+      : "VAL_OFICIAL_ENCABEZADO_DETECTADO";
     const headerRow = sheet.getRow(headerRowNumber);
     const keyMap = {};
     const headersFound = [];
@@ -785,7 +785,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
         .replace(/^'+/, "")
         .trim()
         .toUpperCase();
-      const importedCodeMatch = importedCodeRaw.match(/^MAU(\d{7})$/);
+      const importedCodeMatch = importedCodeRaw.match(/^VAL(\d{7})$/);
       const importedInternalCode = importedCodeMatch ? Number(importedCodeMatch[1]) : null;
       const input = {
         importedCodeRaw,
@@ -1074,7 +1074,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
       }
 
       const invalidFields = [];
-      if (templateType === "MAU_OFICIAL_FILA_13" && !input.importedInternalCode) {
+      if (templateType === "VAL_OFICIAL_FILA_13" && !input.importedInternalCode) {
         invalidFields.push("codigoMau");
       }
       if (input.importedInternalCode && input.quantity > 1) {
@@ -1168,7 +1168,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
         if (previousCodeRow) {
           errors.push({
             row: rowIndex,
-            error: `Codigo MAU duplicado en el archivo; primera aparicion en fila ${previousCodeRow}`,
+            error: `Codigo VAL duplicado en el archivo; primera aparicion en fila ${previousCodeRow}`,
             fields: ["codigoMau"],
             values: { codigoMau: input.importedCodeRaw },
           });
@@ -1215,7 +1215,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
         if (existingImportedAsset) {
           if (existingImportedAsset.establishmentId !== input.establishmentId) {
             throw badRequest(
-              `Codigo MAU ${input.importedCodeRaw} ya existe en otro establecimiento`
+              `Codigo VAL ${input.importedCodeRaw} ya existe en otro establecimiento`
             );
           }
           metrics.skippedExistingAssets = Number(metrics.skippedExistingAssets || 0) + 1;
@@ -1236,7 +1236,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
             row: rowIndex,
             severity: "WARNING",
             imported: true,
-            error: `Posible duplicado por serie, marca y modelo respecto de fila ${previousCreatedRow}; importado igualmente por tener MAU unico`,
+            error: `Posible duplicado por serie, marca y modelo respecto de fila ${previousCreatedRow}; importado igualmente por tener VAL unico`,
             values: { codigoMau: input.importedCodeRaw, name: input.name || null },
           });
           reportedErrorRows.add(rowIndex);
@@ -1353,7 +1353,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
               } catch (e) {
                 if (isInternalCodeUniqueConstraintError(e)) {
                   if (input.importedInternalCode) {
-                    throw badRequest(`Codigo MAU ${input.importedCodeRaw} ya existe en la base de datos`);
+                    throw badRequest(`Codigo VAL ${input.importedCodeRaw} ya existe en la base de datos`);
                   }
                   lastUniqueErr = e;
                   internalCode = (await reserveInternalCodes(tx, establishment.institutionId, 1))[0];
@@ -1399,7 +1399,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
               ...errors[reportedIndex],
               severity: "WARNING",
               imported: true,
-              error: `${errors[reportedIndex].error}; importado igualmente por tener MAU unico`,
+              error: `${errors[reportedIndex].error}; importado igualmente por tener VAL unico`,
               values: {
                 ...(errors[reportedIndex].values || {}),
                 codigoMau: input.importedCodeRaw,
@@ -1707,7 +1707,7 @@ async function buildAssetImportTemplate() {
   sheet.addRow(["Registros:", "", "Bienes:", "", "Valor adquisicion:", "", "Depreciacion anual:", ""]);
   sheet.addRow([]);
   sheet.addRow([
-    "Codigo MAU", "Nombre", "Cantidad", "Numero Factura", "Numero Orden Compra",
+    "Codigo VAL", "Nombre", "Cantidad", "Numero Factura", "Numero Orden Compra",
     "Marca", "Modelo", "Serie", "Responsable", "RUT Responsable", "Cargo Responsable",
     "Centro de Costo", "Cuenta Contable", "Analitico", "Tipo", "Estado",
     "Establecimiento", "Sector", "Valor Adquisicion", "Fecha Adquisicion",

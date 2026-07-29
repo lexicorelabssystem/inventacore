@@ -150,7 +150,7 @@ async function buildPlanchetaCompactExcel(assets, meta) {
   }
 
   sheet.columns = [
-    { width: 16 }, // Codigo MAU
+    { width: 16 }, // Codigo VAL
     { width: 30 }, // Nombre
     { width: 12 }, // Cantidad
     { width: 18 }, // Numero Factura
@@ -261,7 +261,7 @@ async function buildPlanchetaCompactExcel(assets, meta) {
 
   sheet.addRow([]);
   const header = sheet.addRow([
-    "Codigo MAU",
+    "Codigo VAL",
     "Nombre",
     "Cantidad",
     "Numero Factura",

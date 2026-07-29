@@ -10,7 +10,7 @@ async function exportAssetsToExcel(query, user) {
   const sheet = workbook.addWorksheet("Inventario");
 
   sheet.columns = [
-    { header: "Codigo MAU", key: "visibleCode", width: 16 },
+    { header: "Codigo VAL", key: "visibleCode", width: 16 },
     { header: "Codigo Interno", key: "internalCode", width: 15 },
     { header: "Nombre", key: "name", width: 30 },
     { header: "Cantidad", key: "quantity", width: 12 },

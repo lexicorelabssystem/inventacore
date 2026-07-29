@@ -113,7 +113,7 @@ async function main() {
     console.log("Ejemplos a actualizar:");
     updates.slice(0, 20).forEach((item) => {
       console.log(
-        `- MAU${String(item.internalCode).padStart(7, "0")} | ${item.name} => ${item.responsibleName}`
+        `- VAL${String(item.internalCode).padStart(7, "0")} | ${item.name} => ${item.responsibleName}`
       );
     });
   }

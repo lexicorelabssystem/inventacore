@@ -1,5 +1,5 @@
 function formatAssetCode(internalCode, options = {}) {
-  const prefix = String(options.prefix || "MAU").trim().toUpperCase();
+  const prefix = String(options.prefix || "VAL").trim().toUpperCase();
   const padLength = Number.isInteger(options.padLength) ? options.padLength : 7;
   const separator = options.separator === undefined ? "" : String(options.separator);
   const value = Number(internalCode);

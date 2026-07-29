@@ -106,7 +106,7 @@ function splitLabelText(value, maxCharsPerLine = 12, maxLines = 2) {
 function formatLabelCode(internalCode) {
   const numeric = Number(internalCode)
   if (!Number.isInteger(numeric) || numeric <= 0) return ''
-  return `MAU${String(numeric).padStart(7, '0')}`
+  return `VAL${String(numeric).padStart(7, '0')}`
 }
 
 function resolvePrintableLabelCode(asset) {
@@ -795,7 +795,7 @@ function useAssetLabelsAndScan({
           ]
 
       if (!hasStartCodeInput || !Number.isInteger(startCode) || startCode <= 0) {
-        setErr('Ingresa el primer MAU a imprimir como numero valido.')
+        setErr('Ingresa el primer VAL a imprimir como numero valido.')
         return
       }
       if (!groups.length) {
@@ -817,7 +817,7 @@ function useAssetLabelsAndScan({
       }
       const lastCode = startCode + totalQuantity - 1
       if (lastCode > 9999999) {
-        setErr('El rango supera el maximo permitido para MAU de 7 digitos.')
+        setErr('El rango supera el maximo permitido para VAL de 7 digitos.')
         return
       }
 
@@ -840,7 +840,7 @@ function useAssetLabelsAndScan({
 
       await openPrintLabelsForBatch(
         labels,
-        `Etiquetas MAU ${formatLabelCode(startCode)} a ${formatLabelCode(lastCode)}`,
+        `Etiquetas VAL ${formatLabelCode(startCode)} a ${formatLabelCode(lastCode)}`,
         'gob',
         LABEL_PRINT_MODE.BARCODE
       )
@@ -1106,7 +1106,7 @@ function useAssetLabelsAndScan({
         publicUrl: null,
       }
     }
-    const mauMatch = raw.match(/MAU[-_\s]?0*(\d{1,12})/i)
+    const mauMatch = raw.match(/VAL[-_\s]?0*(\d{1,12})/i)
     if (mauMatch?.[1]) {
       return {
         kind: 'internalCode',

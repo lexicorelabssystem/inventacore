@@ -104,7 +104,7 @@ function ImportsAssetsView(props) {
             }}
           />
           <p className="muted">
-            {'El sistema detecta la fila que contiene Codigo, Nombre y Cantidad; importa desde la fila siguiente. Codigo MAU debe tener formato MAU + 7 d\u00edgitos y no puede repetirse.'}
+            {'El sistema detecta la fila que contiene Codigo, Nombre y Cantidad; importa desde la fila siguiente. Codigo VAL debe tener formato VAL + 7 d\u00edgitos y no puede repetirse.'}
           </p>
           {importLoading && (
             <p className="muted">

@@ -8,7 +8,7 @@ const confirmInline = process.argv.find((arg) => arg.startsWith('--confirm='));
 const confirmArg = confirmInline ? confirmInline.slice('--confirm='.length) : '';
 
 const RULES = [
-  { responsibleRegex: /FRANCISCO\s+ALVAREZ\s+SOTO/i, targetEstName: 'UEFAA MAULE' },
+  { responsibleRegex: /FRANCISCO\s+ALVAREZ\s+SOTO/i, targetEstName: 'UEFAA VALLE' },
   { responsibleRegex: /MARIANA\s+RIVERA\s+MARQUEZ/i, targetEstName: 'RESIDENCIA FAMILIAR PEHUENCHE' },
   { responsibleRegex: /CECILIA\s+GAJARDO\s+ORELLANA/i, targetEstName: 'RESIDENCIA FAMILIAR ALAMEDA' },
 ];
