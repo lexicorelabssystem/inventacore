@@ -1,0 +1,2 @@
+ALTER TYPE "AdminEntityType" ADD VALUE IF NOT EXISTS 'USER';
+

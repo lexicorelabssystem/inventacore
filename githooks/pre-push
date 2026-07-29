@@ -1,0 +1,22 @@
+#!/bin/sh
+
+echo "[pre-push] Ejecutando suite critica: npm test"
+npm test
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "[pre-push] Push bloqueado: npm test fallo"
+  exit $status
+fi
+
+echo "[pre-push] Ejecutando smoke admin: npm run test:smoke-admin"
+npm run test:smoke-admin
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "[pre-push] Push bloqueado: npm run test:smoke-admin fallo"
+  exit $status
+fi
+
+echo "[pre-push] OK: push permitido"
+exit 0

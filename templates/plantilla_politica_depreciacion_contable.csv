@@ -1,0 +1,4 @@
+cuenta_contable,nombre_cuenta,categoria_activo,subcategoria_activo,vida_util_anios,tasa_depreciacion_anual_pct,metodo_depreciacion,valor_residual_pct,aplica_desde,observaciones,estado
+ACC-IMP,Equipos TI,INVENTARIO_AVANZADO,TI-002,6,16.6667,LINEAL,0,2026-01-01,Regla referencial para equipos de computacion,VIGENTE
+ACC-MOB,Mobiliario y enseres,MOBILIARIO,OFICINA,10,10,LINEAL,0,2026-01-01,Regla referencial mobiliario administrativo,VIGENTE
+ACC-VEH,Vehiculos,TRANSPORTE,VEHICULOS,7,14.2857,LINEAL,10,2026-01-01,Considera valor residual de 10 por ciento,VIGENTE

@@ -1,0 +1,145 @@
+name: inventacore-labsystem
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-service-security: &service-security
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: inventacore-labsystem-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - inventacore-labsystem-pgdata:/var/lib/postgresql
+    networks:
+      - inventacore-labsystem-private
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    shm_size: 256mb
+    cpus: "1.50"
+    mem_limit: 2g
+    logging: *default-logging
+    <<: *service-security
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: inventacore-labsystem-api:${APP_IMAGE_TAG:-local}
+    container_name: inventacore-labsystem-api
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DIRECT_DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - inventacore-labsystem-private
+    expose:
+      - "3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/ready').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    cpus: "1.00"
+    mem_limit: 1g
+    logging: *default-logging
+    <<: *service-security
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: /api
+    image: inventacore-labsystem-frontend:${APP_IMAGE_TAG:-local}
+    container_name: inventacore-labsystem-frontend
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - inventacore-labsystem-private
+    expose:
+      - "8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /var/cache/nginx:size=64m,mode=0755
+    cpus: "0.50"
+    mem_limit: 256m
+    logging: *default-logging
+    <<: *service-security
+
+  restore-db:
+    profiles: ["restore"]
+    image: postgres:18-alpine
+    container_name: inventacore-labsystem-restore-db
+    restart: "no"
+    environment:
+      POSTGRES_DB: ${RESTORE_POSTGRES_DB}
+      POSTGRES_USER: ${RESTORE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RESTORE_POSTGRES_PASSWORD}
+    volumes:
+      - inventacore-labsystem-restore-pgdata:/var/lib/postgresql
+    networks:
+      - inventacore-labsystem-restore-private
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\"",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    cpus: "1.00"
+    mem_limit: 1g
+    logging: *default-logging
+    <<: *service-security
+
+networks:
+  inventacore-labsystem-private:
+    name: inventacore-labsystem-private
+    driver: bridge
+  inventacore-labsystem-restore-private:
+    name: inventacore-labsystem-restore-private
+    driver: bridge
+
+volumes:
+  inventacore-labsystem-pgdata:
+    name: inventacore-labsystem-pgdata
+  inventacore-labsystem-restore-pgdata:
+    name: inventacore-labsystem-restore-pgdata

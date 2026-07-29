@@ -1,0 +1,19 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+**/node_modules
+frontend/dist
+backups
+tmp
+.vscode
+docs
+postman
+prototipo ficha manual de usuario inventacore
+dudas20-02-2026
+/*.backup
+/*.dump
+/*.pdf
+/*.xlsx
+/*.log

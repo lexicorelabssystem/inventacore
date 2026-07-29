@@ -1,0 +1,462 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Institution {
+  id               Int               @id @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  isActive         Boolean           @default(true)
+  assetSequence    AssetSequence?
+  depreciationRuns DepreciationRun[]
+  establishments   Establishment[]
+  supportRequests  SupportRequest[]
+  users            User[]
+}
+
+model Establishment {
+  id              Int              @id @default(autoincrement())
+  name            String
+  type            String
+  institutionId   Int
+  createdAt       DateTime         @default(now())
+  commune         String?
+  rbd             String?
+  isActive        Boolean          @default(true)
+  assets          Asset[]
+  dependencies    Dependency[]
+  institution     Institution      @relation(fields: [institutionId], references: [id])
+  supportRequests SupportRequest[]
+  users           User[]
+}
+
+model AssetSequence {
+  id            Int         @id @default(autoincrement())
+  lastNumber    Int
+  institutionId Int         @unique
+  institution   Institution @relation(fields: [institutionId], references: [id])
+}
+
+model Dependency {
+  id              Int              @id @default(autoincrement())
+  name            String
+  establishmentId Int
+  createdAt       DateTime         @default(now())
+  isActive        Boolean          @default(true)
+  assets          Asset[]
+  establishment   Establishment    @relation(fields: [establishmentId], references: [id])
+  movementsFrom   Movement[]       @relation("FromDependency")
+  movementsTo     Movement[]       @relation("ToDependency")
+  supportRequests SupportRequest[]
+}
+
+model AssetType {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  minUtmValue Float
+  assets      Asset[]
+}
+
+model AssetState {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  assets Asset[]
+}
+
+model Asset {
+  id                      Int                   @id @default(autoincrement())
+  internalCode            Int                   @unique
+  name                    String
+  brand                   String?
+  modelName               String?
+  serialNumber            String?
+  acquisitionValue        Float
+  acquisitionDate         DateTime
+  depreciationStartDate   DateTime?
+  assetTypeId             Int
+  assetStateId            Int
+  establishmentId         Int
+  dependencyId            Int
+  createdAt               DateTime              @default(now())
+  accountingAccount       String?
+  analyticCode            String?
+  catalogItemId           Int?
+  deletedAt               DateTime?
+  deletedById             Int?
+  isDeleted               Boolean               @default(false)
+  quantity                Int                   @default(1)
+  responsibleName         String?
+  responsibleRut          String?
+  responsibleRole         String?
+  costCenter              String?
+  color                   String?
+  medidas                 String?
+  caracteristicas         String?
+  proveedorRut            String?
+  proveedorNombre         String?
+  ordenCompra             String?
+  ocFecha                 DateTime?
+  factura                 String?
+  facturaFecha            DateTime?
+  guia                    String?
+  guiaFecha               DateTime?
+  folioDevengo            String?
+  usefulLifeYears         Int?
+  depreciationAnnualValue Float?
+  assetState              AssetState            @relation(fields: [assetStateId], references: [id])
+  assetType               AssetType             @relation(fields: [assetTypeId], references: [id])
+  catalogItem             CatalogItem?          @relation(fields: [catalogItemId], references: [id])
+  deletedBy               User?                 @relation("DeletedBy", fields: [deletedById], references: [id])
+  dependency              Dependency            @relation(fields: [dependencyId], references: [id])
+  establishment           Establishment         @relation(fields: [establishmentId], references: [id])
+  audits                  AssetAudit[]
+  evidences               AssetEvidence[]
+  depreciationRunItems    DepreciationRunItem[]
+  movements               Movement[]
+
+  @@index([establishmentId])
+  @@index([dependencyId])
+  @@index([assetStateId])
+  @@index([assetTypeId])
+  @@index([acquisitionDate])
+  @@index([internalCode])
+  @@index([catalogItemId])
+  @@index([isDeleted])
+}
+
+model DepreciationPolicy {
+  id                Int      @id @default(autoincrement())
+  policyKey         String   @unique
+  accountingAccount String
+  accountName       String
+  category          String?
+  subcategory       String?
+  usefulLifeYears   Int
+  annualRatePct     Float
+  method            String   @default("LINEAL")
+  residualRatePct   Float    @default(0)
+  appliesFrom       DateTime
+  observations      String?
+  status            String   @default("VIGENTE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
+  @@index([accountingAccount])
+  @@index([appliesFrom])
+}
+
+model DepreciationRun {
+  id                      Int                   @id @default(autoincrement())
+  institutionId           Int
+  fiscalYear              Int
+  closingDate             DateTime
+  closedAt                DateTime              @default(now())
+  closedById              Int?
+  totalAssets             Int                   @default(0)
+  totalAnnualDepreciation Float                 @default(0)
+  totalClosingBookValue   Float                 @default(0)
+  institution             Institution           @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  closedBy                User?                 @relation("DepreciationRunClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  items                   DepreciationRunItem[]
+
+  @@unique([institutionId, fiscalYear])
+  @@index([institutionId])
+  @@index([fiscalYear])
+}
+
+model DepreciationRunItem {
+  id                              Int             @id @default(autoincrement())
+  depreciationRunId               Int
+  assetId                         Int?
+  assetInternalCode               Int
+  assetName                       String
+  establishmentId                 Int?
+  establishmentName               String?
+  dependencyId                    Int?
+  dependencyName                  String?
+  acquisitionValueSnapshot        Float
+  depreciationStartDateSnapshot   DateTime?
+  usefulLifeYearsSnapshot         Int?
+  depreciationAnnualValueSnapshot Float?
+  residualAmountSnapshot          Float           @default(0)
+  openingBookValue                Float
+  annualDepreciation              Float
+  closingBookValue                Float
+  accumulatedDepreciation         Float
+  periodStart                     DateTime?
+  periodEnd                       DateTime?
+  createdAt                       DateTime        @default(now())
+  depreciationRun                 DepreciationRun @relation(fields: [depreciationRunId], references: [id], onDelete: Cascade)
+  asset                           Asset?          @relation(fields: [assetId], references: [id], onDelete: SetNull)
+
+  @@unique([depreciationRunId, assetId])
+  @@index([depreciationRunId])
+  @@index([assetId])
+}
+
+model Movement {
+  id               Int             @id @default(autoincrement())
+  type             MovementType
+  assetId          Int
+  fromDependencyId Int?
+  toDependencyId   Int?
+  userId           Int
+  createdAt        DateTime        @default(now())
+  reason           String?
+  reasonCode       String?
+  evidences        AssetEvidence[]
+  asset            Asset           @relation(fields: [assetId], references: [id])
+  fromDependency   Dependency?     @relation("FromDependency", fields: [fromDependencyId], references: [id])
+  toDependency     Dependency?     @relation("ToDependency", fields: [toDependencyId], references: [id])
+  user             User            @relation(fields: [userId], references: [id])
+}
+
+model Role {
+  id    Int      @id @default(autoincrement())
+  type  RoleType @unique
+  users User[]
+}
+
+model User {
+  id                      Int                     @id @default(autoincrement())
+  name                    String
+  email                   String                  @unique
+  password                String
+  roleId                  Int
+  institutionId           Int
+  establishmentId         Int?
+  createdAt               DateTime                @default(now())
+  isActive                Boolean                 @default(true)
+  adminAudits             AdminAudit[]
+  deletedAssets           Asset[]                 @relation("DeletedBy")
+  assetAudits             AssetAudit[]
+  assetEvidences          AssetEvidence[]
+  assetImports            AssetImportBatch[]
+  depreciationRunsClosed  DepreciationRun[]       @relation("DepreciationRunClosedBy")
+  loginAudits             LoginAudit[]
+  movements               Movement[]
+  refreshTokens           RefreshToken[]
+  supportRequestsAssigned SupportRequest[]        @relation("SupportRequestAssignedTo")
+  supportRequestsCreated  SupportRequest[]        @relation("SupportRequestCreatedBy")
+  supportRequestComments  SupportRequestComment[]
+  establishment           Establishment?          @relation(fields: [establishmentId], references: [id])
+  institution             Institution             @relation(fields: [institutionId], references: [id])
+  role                    Role                    @relation(fields: [roleId], references: [id])
+  photo                   UserPhoto?
+}
+
+model UserPhoto {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  mimeType  String
+  content   Bytes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdminAudit {
+  id         Int             @id @default(autoincrement())
+  entityType AdminEntityType
+  action     AdminActionType
+  entityId   Int
+  before     Json?
+  after      Json?
+  userId     Int
+  createdAt  DateTime        @default(now())
+  user       User            @relation(fields: [userId], references: [id])
+}
+
+model AssetAudit {
+  id        Int             @id @default(autoincrement())
+  action    AssetActionType
+  assetId   Int
+  before    Json?
+  after     Json?
+  userId    Int
+  createdAt DateTime        @default(now())
+  asset     Asset           @relation(fields: [assetId], references: [id])
+  user      User            @relation(fields: [userId], references: [id])
+
+  @@index([assetId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+model CatalogItem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String
+  subcategory String?
+  brand       String?
+  modelName   String?
+  description String?
+  unit        String?
+  createdAt   DateTime @default(now())
+  officialKey String?  @unique
+  assets      Asset[]
+
+  @@index([name])
+  @@index([category])
+  @@index([subcategory])
+  @@index([brand])
+  @@index([modelName])
+}
+
+model LoginAudit {
+  id        Int      @id @default(autoincrement())
+  email     String
+  ip        String
+  userId    Int?
+  success   Boolean
+  reason    String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userId    Int
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model AssetImportBatch {
+  id           Int       @id @default(autoincrement())
+  filename     String
+  status       String
+  createdCount Int       @default(0)
+  errorCount   Int       @default(0)
+  errors       Json?
+  userId       Int
+  createdAt    DateTime  @default(now())
+  completedAt  DateTime?
+  user         User      @relation(fields: [userId], references: [id])
+}
+
+model AssetEvidence {
+  id           Int       @id @default(autoincrement())
+  assetId      Int
+  movementId   Int?
+  uploadedById Int
+  docType      String
+  note         String?
+  fileName     String
+  mimeType     String
+  sizeBytes    Int
+  content      Bytes
+  createdAt    DateTime  @default(now())
+  asset        Asset     @relation(fields: [assetId], references: [id])
+  movement     Movement? @relation(fields: [movementId], references: [id])
+  uploadedBy   User      @relation(fields: [uploadedById], references: [id])
+
+  @@index([assetId])
+  @@index([movementId])
+  @@index([uploadedById])
+  @@index([createdAt])
+}
+
+model SupportRequest {
+  id              Int                     @id @default(autoincrement())
+  subject         String
+  question        String
+  responseDraft   String?
+  status          SupportRequestStatus    @default(OPEN)
+  priority        SupportRequestPriority  @default(MEDIUM)
+  dueAt           DateTime
+  resolvedAt      DateTime?
+  source          String?
+  createdById     Int
+  assignedToId    Int?
+  institutionId   Int?
+  establishmentId Int?
+  dependencyId    Int?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  assignedTo      User?                   @relation("SupportRequestAssignedTo", fields: [assignedToId], references: [id])
+  createdBy       User                    @relation("SupportRequestCreatedBy", fields: [createdById], references: [id])
+  dependency      Dependency?             @relation(fields: [dependencyId], references: [id])
+  establishment   Establishment?          @relation(fields: [establishmentId], references: [id])
+  institution     Institution?            @relation(fields: [institutionId], references: [id])
+  comments        SupportRequestComment[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([dueAt])
+  @@index([createdAt])
+  @@index([institutionId])
+  @@index([establishmentId])
+  @@index([dependencyId])
+}
+
+model SupportRequestComment {
+  id        Int            @id @default(autoincrement())
+  requestId Int
+  authorId  Int
+  message   String
+  createdAt DateTime       @default(now())
+  author    User           @relation(fields: [authorId], references: [id])
+  request   SupportRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+enum MovementType {
+  TRANSFER
+  RELOCATION
+  STATUS_CHANGE
+  INVENTORY_CHECK
+}
+
+enum RoleType {
+  ADMIN_CENTRAL
+  ADMIN_ESTABLISHMENT
+  VIEWER
+}
+
+enum SupportRequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  OVERDUE
+}
+
+enum SupportRequestPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AdminEntityType {
+  INSTITUTION
+  ESTABLISHMENT
+  DEPENDENCY
+  CATALOG_ITEM
+  USER
+}
+
+enum AdminActionType {
+  CREATE
+  UPDATE
+  DELETE
+  DEACTIVATE
+}
+
+enum AssetActionType {
+  CREATE
+  RELOCATE
+  STATUS_CHANGE
+  UPDATE
+  RESTORE
+}

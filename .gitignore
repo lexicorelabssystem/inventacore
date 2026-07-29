@@ -1,0 +1,75 @@
+node_modules/
+# Keep environment variables out of version control
+.env
+.env.*
+!.env.example
+*.env
+
+/generated/prisma
+
+# Local Excel artifacts and import samples
+INVENTARIO_*.xlsx
+catalog_items_template.xlsx
+~$*.xlsx
+
+# Local test/export artifacts (keep out of git)
+TABLA_PARA EXPORTAR.xlsx
+assets_filtrados.xlsx
+establishments.xlsx
+institutions.xlsx
+plancheta.xlsx
+plancheta.pdf
+deepseek_csv_*.txt
+mantene.png
+mover.png
+plancheta.png
+manual-operativo-tecnico.pdf
+backups/
+mover .png
+plancge[}].png
+DSASDFDSDFDFDSDFGHGFVD.png
+login_audit.xlsx
+CATALOGO_MAESTRO_CONTABLE_LISTO.xlsx
+assets_filtrados (1).xlsx
+exel para exportar e importar/
+
+# Local browser exports / snapshots
+inventario * Render Dashboard.html
+inventario * Render Dashboard_files/
+
+.vercel
+.env*.local
+
+# Local IDE/workspace settings
+.vscode/
+tmp/
+
+# Frontend local env files (keep example template versioned)
+frontend/.env.development
+frontend/.env.production
+frontend/.env.*
+!frontend/.env.example
+
+# Local build/package artifacts
+frontend/dist.zip
+
+# Local generated exports and documents
+*.pdf
+*.xlsx
+
+# Logs locales
+*.log
+
+# Respaldos de base de datos
+*.backup
+
+# Dependencias y compilaciones
+frontend/node_modules/
+frontend/dist/
+
+# Notas locales con credenciales (nunca versionar)
+conta user/
+
+# Archivos ajenos al proyecto
+cordillera_puerto.env
+inventariovvvv.env
