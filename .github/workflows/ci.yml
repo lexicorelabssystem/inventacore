@@ -32,7 +32,11 @@ jobs:
       UTM_VALUE_CLP: "65000"
       NODE_ENV: test
       TEST_CENTRAL_EMAIL: admin@cordillera.local
-      TEST_CENTRAL_PASSWORD: admin123
+      TEST_CENTRAL_PASSWORD: admin123456789
+      SEED_ADMIN_CENTRAL_EMAIL: admin@cordillera.local
+      SEED_ADMIN_CENTRAL_PASSWORD: admin123456789
+      SEED_ADMIN_ESTABLISHMENT_EMAIL: establecimiento@cordillera.local
+      SEED_ADMIN_ESTABLISHMENT_PASSWORD: establecimiento123
 
     steps:
       - name: Checkout
