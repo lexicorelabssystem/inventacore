@@ -42,11 +42,20 @@ async function listAssetImportBatches(query, user) {
     skip,
     include: {
       user: { select: { id: true, name: true, email: true } },
+      _count: { select: { assets: true } },
     },
   });
 
   const total = await prisma.assetImportBatch.count({ where });
-  return { total, skip, take, items };
+  return {
+    total,
+    skip,
+    take,
+    items: items.map(({ _count, ...item }) => ({
+      ...item,
+      linkedAssetCount: _count.assets,
+    })),
+  };
 }
 
 module.exports = { listAssetImportBatches };

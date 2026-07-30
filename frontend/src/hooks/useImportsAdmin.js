@@ -181,6 +181,7 @@ function useImportsAdmin({
   const [importHistoryPage, setImportHistoryPage] = useState(1)
   const [importHistoryTotal, setImportHistoryTotal] = useState(0)
   const [importHistoryLoading, setImportHistoryLoading] = useState(false)
+  const [deletingImportId, setDeletingImportId] = useState(null)
   const [importHistoryOpen, setImportHistoryOpen] = useState(null)
   const [importHistoryFilters, setImportHistoryFilters] = useState({
     fromDate: '',
@@ -785,6 +786,28 @@ function useImportsAdmin({
     }
   }
 
+  async function deleteImportBatch(batch) {
+    if (!batch?.id || deletingImportId) return
+    const linkedCount = Number(batch.linkedAssetCount || 0)
+    const message = linkedCount > 0
+      ? `Se borraran ${linkedCount} activos creados por la importacion ${batch.filename} y su historial relacionado. Las demas importaciones no se modificaran. ¿Continuar?`
+      : 'Esta importacion no tiene activos vinculados. Se borrara solamente su registro del historial. ¿Continuar?'
+    if (!window.confirm(message)) return
+    setDeletingImportId(batch.id)
+    try {
+      const result = await api(`/assets/imports/${batch.id}`, { method: 'DELETE' })
+      setOk(`Importacion eliminada: ${result.deletedAssetCount || 0} activos borrados.`)
+      const page = importHistory.length === 1 && importHistoryPage > 1
+        ? importHistoryPage - 1
+        : importHistoryPage
+      await loadImportHistory(page)
+    } catch (err) {
+      setErr(err)
+    } finally {
+      setDeletingImportId(null)
+    }
+  }
+
   useEffect(() => () => stopImportJobPolling(), [])
 
   useEffect(() => {
@@ -843,6 +866,7 @@ function useImportsAdmin({
     importHistoryPage,
     importHistoryTotal,
     importHistoryLoading,
+    deletingImportId,
     importHistoryOpen,
     setImportHistoryOpen,
     importHistoryFilters,
@@ -864,6 +888,7 @@ function useImportsAdmin({
     loadImportHistory,
     loadImportJobStatus,
     resumeImportJob,
+    deleteImportBatch,
   }
 }
 

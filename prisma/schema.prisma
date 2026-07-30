@@ -107,12 +107,14 @@ model Asset {
   folioDevengo            String?
   usefulLifeYears         Int?
   depreciationAnnualValue Float?
+  importBatchId           Int?
   assetState              AssetState            @relation(fields: [assetStateId], references: [id])
   assetType               AssetType             @relation(fields: [assetTypeId], references: [id])
   catalogItem             CatalogItem?          @relation(fields: [catalogItemId], references: [id])
   deletedBy               User?                 @relation("DeletedBy", fields: [deletedById], references: [id])
   dependency              Dependency            @relation(fields: [dependencyId], references: [id])
   establishment           Establishment         @relation(fields: [establishmentId], references: [id])
+  importBatch             AssetImportBatch?      @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
   audits                  AssetAudit[]
   evidences               AssetEvidence[]
   depreciationRunItems    DepreciationRunItem[]
@@ -126,6 +128,7 @@ model Asset {
   @@index([internalCode])
   @@index([catalogItemId])
   @@index([isDeleted])
+  @@index([importBatchId])
 }
 
 model DepreciationPolicy {
@@ -341,6 +344,7 @@ model AssetImportBatch {
   createdAt    DateTime  @default(now())
   completedAt  DateTime?
   user         User      @relation(fields: [userId], references: [id])
+  assets       Asset[]
 }
 
 model AssetEvidence {

@@ -1,3 +1,4 @@
+const { deleteAssetImportBatch } = require('../services/assetImportDeleteService');
 const express = require("express");
 const router = express.Router();
 
@@ -419,8 +420,18 @@ router.post(
   })
 );
 
+router.delete(
+  '/imports/:id',
+  blockWriteForViewer,
+  validateParams(idParam),
+  asyncHandler(async (req, res) => {
+    const result = await deleteAssetImportBatch(Number(req.params.id), req.user);
+    res.json(result);
+  })
+);
+
 router.get(
-  "/imports/export/excel",
+  '/imports/export/excel',
   validateQuery(importHistoryQuery),
   asyncHandler(async (req, res) => {
     const workbook = await exportAssetImportHistoryToExcel(req.query, req.user);

@@ -12,6 +12,7 @@ function ImportsAssetsView(props) {
     handlePreviewFile,
     handleImportUpload,
     resumeImportJob,
+    deleteImportBatch,
     importLoading,
     importResult,
     importSchemaDetails,
@@ -24,6 +25,7 @@ function ImportsAssetsView(props) {
     setImportHistoryFilters,
     loadImportHistory,
     importHistoryLoading,
+    deletingImportId,
     importHistory,
     setImportHistoryOpen,
     importHistoryOpen,
@@ -318,6 +320,7 @@ function ImportsAssetsView(props) {
               <div className="row-actions">
                 <span className="pill">{batch.status}</span>
                 <span className="pill">Creados: {batch.createdCount}</span>
+                <span className="pill">Vinculados: {batch.linkedAssetCount || 0}</span>
                 <span className="pill">{UI_TEXT.errors}: {batch.errorCount}</span>
                 {batch.errors && (
                   <button
@@ -342,6 +345,14 @@ function ImportsAssetsView(props) {
                       Incorporar filas con error
                     </button>
                   )}
+                <button
+                  className='danger danger-outline'
+                  disabled={deletingImportId === batch.id || batch.status === 'PROCESSING'}
+                  onClick={() => deleteImportBatch(batch)}
+                  title={batch.status === 'PROCESSING' ? 'La importacion aun esta en proceso.' : ''}
+                >
+                  {deletingImportId === batch.id ? 'Borrando...' : 'Borrar importacion'}
+                </button>
               </div>
             </div>
           ))}

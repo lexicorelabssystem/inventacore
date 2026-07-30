@@ -1285,6 +1285,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
                 assetStateId: state.id,
                 establishmentId: establishment.id,
                 dependencyId: dependency.id,
+                importBatchId: batch,
               })),
             });
 
@@ -1347,6 +1348,7 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
                     assetStateId: state.id,
                     establishmentId: establishment.id,
                     dependencyId: dependency.id,
+                    importBatchId: batch,
                   },
                 });
 
