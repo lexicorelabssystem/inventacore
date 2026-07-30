@@ -1458,19 +1458,15 @@ async function importAssetsFromExcel(buffer, user, filename = "import.xlsx", opt
         status: "FAILED",
         completedAt: new Date(),
         createdCount,
-        errorCount: errors.length + (err?.details ? 1 : 0),
+        errorCount: errors.length + 1,
         errors: buildBatchErrorsPayload({
           items: [
             ...errors,
-            ...(err?.details
-              ? [
-                  {
-                    row: Number(metrics.resumeRow || 0) || null,
-                    error: err.message || "Error",
-                    details: err.details,
-                  },
-                ]
-              : []),
+            {
+              row: Number(metrics.resumeRow || 0) || null,
+              error: err?.message || "Error",
+              ...(err?.details ? { details: err.details } : {}),
+            },
           ],
           metrics: {
             ...metrics,
