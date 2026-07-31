@@ -885,11 +885,10 @@ function useAssetLabelsAndScan({
     const filters = { ...assetListFilters, ...filterOverrides }
     const baseParams = buildAssetLabelFilterParams(filters)
     const pageSize = 100
-    const maxLabels = 1000
     const items = []
     let total = null
 
-    for (let skip = 0; skip < maxLabels; skip += pageSize) {
+    for (let skip = 0; total === null || skip < total; skip += pageSize) {
       const params = new URLSearchParams(baseParams)
       params.set('take', String(pageSize))
       params.set('skip', String(skip))
@@ -898,9 +897,6 @@ function useAssetLabelsAndScan({
       const pageItems = data.items || []
       if (skip === 0) {
         total = Number(data.total || 0)
-        if (total > maxLabels) {
-          throw new Error(`La seleccion contiene ${total} activos. Filtra a ${maxLabels} o menos por impresion.`)
-        }
       }
       items.push(...pageItems)
       if (pageItems.length < pageSize || items.length >= total) break

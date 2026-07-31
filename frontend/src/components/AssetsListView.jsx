@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { UI_TEXT } from '../constants/uiText'
 
+const MASS_PRINT_ALL_ESTABLISHMENTS = '__all__'
+
 function AssetCatalogTable(props) {
   const {
     showAssetCatalogList,
@@ -94,14 +96,12 @@ function AssetRecordsTable(props) {
   })
 
   function requestMassPrint(mode) {
-    if (assetListFilters.institutionId && assetListFilters.establishmentId) {
-      const print = mode === 'barcode' ? openPrintAssetListBarcodeLabels : openPrintAssetListQrLabels
-      print()
-      return
-    }
     const institutionId = assetListFilters.institutionId || ''
     setMassPrintMode(mode)
-    setMassPrintScope({ institutionId, establishmentId: '' })
+    setMassPrintScope({
+      institutionId,
+      establishmentId: assetListFilters.establishmentId || '',
+    })
     if (institutionId) loadAssetListEstablishments(institutionId)
   }
 
@@ -116,9 +116,20 @@ function AssetRecordsTable(props) {
       massPrintMode === 'barcode' ? openPrintAssetListBarcodeLabels : openPrintAssetListQrLabels
     closeMassPrintModal()
     await print({
+      id: '',
+      internalCode: '',
+      q: '',
+      responsibleName: '',
+      costCenter: '',
       institutionId: massPrintScope.institutionId,
-      establishmentId: massPrintScope.establishmentId,
+      establishmentId:
+        massPrintScope.establishmentId === MASS_PRINT_ALL_ESTABLISHMENTS
+          ? ''
+          : massPrintScope.establishmentId,
       dependencyId: '',
+      assetStateId: '',
+      fromDate: '',
+      toDate: '',
     })
   }
   function formatMauPreview(value) {
@@ -579,7 +590,8 @@ function AssetRecordsTable(props) {
             </div>
             <div className="modal-body modal-form">
               <p className="muted">
-                Selecciona la residencia o establecimiento cuyos activos deseas imprimir.
+                Selecciona una residencia o elige todas para imprimir todos los activos de la
+                institucion de una sola vez.
               </p>
               <label className="modal-label">
                 <strong>Institucion</strong>
@@ -612,6 +624,9 @@ function AssetRecordsTable(props) {
                   }
                 >
                   <option value="">Selecciona una residencia</option>
+                  <option value={MASS_PRINT_ALL_ESTABLISHMENTS}>
+                    Todas las residencias / establecimientos
+                  </option>
                   {assetListEstablishments.map((establishment) => (
                     <option key={establishment.id} value={establishment.id}>
                       {establishment.name}
