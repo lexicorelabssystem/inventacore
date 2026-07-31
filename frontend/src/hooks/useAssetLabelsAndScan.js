@@ -706,13 +706,14 @@ function useAssetLabelsAndScan({
     items,
     title = '',
     brandingInput = 'gob',
-    modeInput = LABEL_PRINT_MODE.QR
+    modeInput = LABEL_PRINT_MODE.QR,
+    printWindow = null
   ) {
     const batch = getPrintableLabelBatch(items)
     if (!batch.length) return
     const mode = normalizeLabelPrintMode(modeInput)
     const branding = resolveLabelBranding(brandingInput)
-    const win = window.open('', '_blank', 'width=640,height=520')
+    const win = printWindow || window.open('', '_blank', 'width=640,height=520')
     if (!win) {
       setErr('El navegador bloqueo la ventana de impresion.')
       return
@@ -906,14 +907,25 @@ function useAssetLabelsAndScan({
   }
 
   async function openPrintAssetListQrLabels(filterOverrides = {}) {
+    let printWindow = null
     try {
       const filters = { ...assetListFilters, ...filterOverrides }
       if (!filters.institutionId) {
         setErr('Selecciona una institucion antes de imprimir etiquetas masivamente.')
         return
       }
+      printWindow = window.open('', '_blank', 'width=640,height=520')
+      if (!printWindow) {
+        setErr('El navegador bloqueo la ventana de impresion.')
+        return
+      }
+      printWindow.document.write(
+        '<!doctype html><html><head><title>Preparando etiquetas</title></head><body><p>Preparando todas las etiquetas para imprimir...</p></body></html>'
+      )
+      printWindow.document.close()
       const items = await fetchAssetListBatchForLabels(filterOverrides)
       if (!items.length) {
+        printWindow.close()
         setErr('No hay activos fijos filtrados para imprimir QR.')
         return
       }
@@ -921,22 +933,35 @@ function useAssetLabelsAndScan({
         items,
         `Etiquetas QR activos (${items.length})`,
         'gob',
-        LABEL_PRINT_MODE.QR
+        LABEL_PRINT_MODE.QR,
+        printWindow
       )
     } catch (err) {
+      if (printWindow && !printWindow.closed) printWindow.close()
       setErr(err)
     }
   }
 
   async function openPrintAssetListBarcodeLabels(filterOverrides = {}) {
+    let printWindow = null
     try {
       const filters = { ...assetListFilters, ...filterOverrides }
       if (!filters.institutionId) {
         setErr('Selecciona una institucion antes de imprimir etiquetas masivamente.')
         return
       }
+      printWindow = window.open('', '_blank', 'width=640,height=520')
+      if (!printWindow) {
+        setErr('El navegador bloqueo la ventana de impresion.')
+        return
+      }
+      printWindow.document.write(
+        '<!doctype html><html><head><title>Preparando etiquetas</title></head><body><p>Preparando todas las etiquetas para imprimir...</p></body></html>'
+      )
+      printWindow.document.close()
       const items = await fetchAssetListBatchForLabels(filterOverrides)
       if (!items.length) {
+        printWindow.close()
         setErr('No hay activos fijos filtrados para imprimir barras.')
         return
       }
@@ -944,9 +969,11 @@ function useAssetLabelsAndScan({
         items,
         `Etiquetas barra activos (${items.length})`,
         'gob',
-        LABEL_PRINT_MODE.BARCODE
+        LABEL_PRINT_MODE.BARCODE,
+        printWindow
       )
     } catch (err) {
+      if (printWindow && !printWindow.closed) printWindow.close()
       setErr(err)
     }
   }
